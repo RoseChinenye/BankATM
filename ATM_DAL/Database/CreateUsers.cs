@@ -4,7 +4,7 @@ using System;
 
 namespace ATM_BLL.Implementation
 {
-    public class CreateUsers 
+    public class CreateUsers : IDisposable
     {
         private readonly AtmDbContext _dbContext;
         private bool _disposed;
@@ -52,7 +52,7 @@ namespace ATM_BLL.Implementation
                 try
                 {
                     command.ExecuteNonQuery();
-
+                    Console.WriteLine("Atm Users table created and populated successfully.");
 
                 }
                 catch (Exception ex)
@@ -78,8 +78,6 @@ namespace ATM_BLL.Implementation
             if (disposing)
             {
                 _dbContext.Dispose();
-
-
 
             }
 

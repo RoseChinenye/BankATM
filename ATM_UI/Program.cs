@@ -12,8 +12,12 @@ namespace ATM_UI
 
 
             //Creating Default Atm users
-           /* CreateUsers atmUsers = new CreateUsers(new AtmDbContext());
-            atmUsers.CreateAtmUsers();*/
+            //CreateUsers atmUsers = new CreateUsers(new AtmDbContext());
+            //atmUsers.CreateAtmUsers();
+
+            //Creating Transaction History Table
+            //CreateTransactionHistory history = new CreateTransactionHistory(new AtmDbContext());
+            //history.TransactionHistory();
 
             starter.Run();
         }

@@ -3,6 +3,7 @@ using ATM_DAL.Database;
 using ATM_DAL.Domain;
 using Microsoft.Data.SqlClient;
 using System;
+using static System.TimeZoneInfo;
 
 namespace ATM_BLL.Implementation
 {
@@ -45,6 +46,9 @@ namespace ATM_BLL.Implementation
 
                     Balance += depositAmount;
 
+                    string TransactionType = "Deposit";
+                    DateTime TransactionTime = DateTime.Now;
+
                     string updateQuery = "UPDATE ATM_Users SET Balance = @balance WHERE CardNumber = @cardNumber AND Pin = @pin";
                     using (SqlCommand updateCommand = new SqlCommand(updateQuery, sqlConn))
                     {
@@ -52,12 +56,28 @@ namespace ATM_BLL.Implementation
                         updateCommand.Parameters.AddWithValue("@cardNumber", User.CardNumber);
                         updateCommand.Parameters.AddWithValue("@pin", User.Pin);
                         updateCommand.ExecuteNonQuery();
-                        Console.WriteLine($"Deposit Successful! Your new balance is: #{Balance}\n\nPress ENTER to go to Main Menu");
-
-                        Console.ReadKey();
-                        Console.Clear();
-                        AtmMenu.GetMenu();
                     }
+
+                    string InsertHistoryQuery = @"INSERT INTO Transaction_History (UserCardNumber, TransactionType, Amount, Date)
+                                                   VALUES (@UserCardNumber, @TransactionType, @Amount, @Date)";
+
+                    using (SqlCommand historyCommand = new SqlCommand(InsertHistoryQuery, sqlConn))
+                    {
+                        historyCommand.Parameters.AddWithValue("@UserCardNumber", User.CardNumber);
+                        historyCommand.Parameters.AddWithValue("@TransactionType", TransactionType);
+                        historyCommand.Parameters.AddWithValue("@Amount", depositAmount);
+                        historyCommand.Parameters.AddWithValue("@Date", TransactionTime);
+
+                        historyCommand.ExecuteNonQuery();
+                    }
+
+                    Console.WriteLine($"Deposit Successful! Your new balance is: #{Balance}\n\nPress ENTER to go to Main Menu");
+
+                    Console.ReadKey();
+                    Console.Clear();
+                    AtmMenu.GetMenu();
+                        
+                    
 
                 }
                 catch (Exception e)
@@ -104,6 +124,10 @@ namespace ATM_BLL.Implementation
                     {
                         Balance -= WithdrawalAmount;
 
+
+                        string TransactionType = "Withdrawal";
+                        DateTime TransactionTime = DateTime.Now;
+
                         string updateQuery = "UPDATE ATM_Users SET Balance = @balance WHERE CardNumber = @cardNumber AND Pin = @pin";
                         using (SqlCommand updateCommand = new SqlCommand(updateQuery, sqlConn))
                         {
@@ -111,12 +135,28 @@ namespace ATM_BLL.Implementation
                             updateCommand.Parameters.AddWithValue("@cardNumber", User.CardNumber);
                             updateCommand.Parameters.AddWithValue("@pin", User.Pin);
                             updateCommand.ExecuteNonQuery();
-                            Console.WriteLine($"Withdrawal successful. Your new balance is: #{Balance}\n\nPress ENTER to go to Main Menu");
-
-                            Console.ReadKey();
-                            Console.Clear();
-                            AtmMenu.GetMenu();
                         }
+
+
+                        string InsertHistoryQuery = @"INSERT INTO Transaction_History (UserCardNumber, TransactionType, Amount, Date)
+                                                   VALUES (@UserCardNumber, @TransactionType, @Amount, @Date)";
+
+                        using (SqlCommand historyCommand = new SqlCommand(InsertHistoryQuery, sqlConn))
+                        {
+                            historyCommand.Parameters.AddWithValue("@UserCardNumber", User.CardNumber);
+                            historyCommand.Parameters.AddWithValue("@TransactionType", TransactionType);
+                            historyCommand.Parameters.AddWithValue("@Amount", WithdrawalAmount);
+                            historyCommand.Parameters.AddWithValue("@Date", TransactionTime);
+
+                            historyCommand.ExecuteNonQuery();
+                        }
+                        
+                        Console.WriteLine($"Withdrawal successful. Your new balance is: #{Balance}\n\nPress ENTER to go to Main Menu");
+
+                        Console.ReadKey();
+                        Console.Clear();
+                        AtmMenu.GetMenu();
+                        
 
                     }
 
@@ -202,6 +242,10 @@ namespace ATM_BLL.Implementation
                         else
                         {
                             Balance -= TransferAmount;
+
+                            string TransactionType = "Transfer";
+                            DateTime TransactionTime = DateTime.Now;
+
                             string SenderQuery = "UPDATE ATM_Users SET Balance = @balance WHERE CardNumber = @cardNumber AND PIN = @pin";
                             using (SqlCommand updateCommand = new SqlCommand(SenderQuery, sqlConn))
                             {
@@ -225,13 +269,27 @@ namespace ATM_BLL.Implementation
                                         recieverUpdateCommand.Parameters.AddWithValue("@recieverAccountNo", RecieverAccountNo);
 
                                         recieverUpdateCommand.ExecuteNonQuery();
-
-                                        Console.WriteLine($"Transfer successful. Your new balance is: #{Balance}\n\nPress Enter to go to the Main Menu");
-
-                                        Console.ReadKey();
-                                        Console.Clear();
-                                        AtmMenu.GetMenu();
                                     }
+
+                                    string InsertHistoryQuery = @"INSERT INTO Transaction_History (UserCardNumber, TransactionType, Amount, Date)
+                                                   VALUES (@UserCardNumber, @TransactionType, @Amount, @Date)";
+
+                                    using (SqlCommand historyCommand = new SqlCommand(InsertHistoryQuery, sqlConn))
+                                    {
+                                        historyCommand.Parameters.AddWithValue("@UserCardNumber", User.CardNumber);
+                                        historyCommand.Parameters.AddWithValue("@TransactionType", TransactionType);
+                                        historyCommand.Parameters.AddWithValue("@Amount", TransferAmount);
+                                        historyCommand.Parameters.AddWithValue("@Date", TransactionTime);
+
+                                        historyCommand.ExecuteNonQuery();
+                                    }
+
+                                    Console.WriteLine($"Transfer successful. Your new balance is: #{Balance}\n\nPress Enter to go to the Main Menu");
+
+                                    Console.ReadKey();
+                                    Console.Clear();
+                                    AtmMenu.GetMenu();
+                                    
                                 }
 
                             }
