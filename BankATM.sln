@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATM_BLL", "ATM_BLL\ATM_BLL.csproj", "{2ABFE20B-6F24-4555-89EE-56055ED5038E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATM_DAL", "ATM_DAL\ATM_DAL.csproj", "{D4279050-DD21-40DC-8600-997B5AA6BC5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATM_UI", "ATM_UI\ATM_UI.csproj", "{3A7647D0-63FE-45D3-A008-A604EE93BEE4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2ABFE20B-6F24-4555-89EE-56055ED5038E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ABFE20B-6F24-4555-89EE-56055ED5038E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ABFE20B-6F24-4555-89EE-56055ED5038E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ABFE20B-6F24-4555-89EE-56055ED5038E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4279050-DD21-40DC-8600-997B5AA6BC5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4279050-DD21-40DC-8600-997B5AA6BC5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4279050-DD21-40DC-8600-997B5AA6BC5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4279050-DD21-40DC-8600-997B5AA6BC5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A7647D0-63FE-45D3-A008-A604EE93BEE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A7647D0-63FE-45D3-A008-A604EE93BEE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A7647D0-63FE-45D3-A008-A604EE93BEE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A7647D0-63FE-45D3-A008-A604EE93BEE4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1079C384-AB35-448D-B245-0F13F22598B0}
+	EndGlobalSection
+EndGlobal
