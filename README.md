@@ -1,13 +1,12 @@
 # BANK ATM 😃👓👓
 
 ## About 👓
-***
 
 This is a simple implementation of Bank ATM application using ADO.NET and Microsoft SQL Server Management System.
-<br/>
-***
+
+---
 ## Definition of Terms 👓
-***
+
 **ADO.NET :**
 The .NET platform defines several namespaces that allow you to interact with relational database systems. 
 Collectively speaking, these namespaces are known as ADO.NET.
@@ -17,9 +16,9 @@ ADO.NET provides consistent access to data sources such as SQL Server and XML, a
 **Microsoft SQL Server Management System :**
 It is an integrated environment for managing any SQL infrastructure. In this project, we used SSMS to access, configure, manage, administer, and develop all components of the SQL Server.
 
-***
+---
 ## ATM SERVICES 👓
-***
+
 - Deposit
 - Withdrawal
 - Check Balance
@@ -27,18 +26,18 @@ It is an integrated environment for managing any SQL infrastructure. In this pro
 
 N/B : All the operations done in this ATM are saved!
 
-***
+---
 ## Demo Login Credentials 👓
-***
+
 | Card Number | Pin |
 | ----------- | ----------- |
 | 1020304050 | 1234 |
 | 1121314151 | 1030 |
 | 1222324052 | 1935 |
 
-***
+---
 ## Steps to Run 👓
-***
+
 Follow the following steps to successfully run and use this application.
 1. **Paste your system's server name on the Connection String**
 - Open the *ATM_DAL* project
@@ -51,7 +50,12 @@ string connectionString = (@"Data Source = (Your Server Name); Integrated Securi
 ```
 - Save
 
-2. **Create the Database on your system programmatically by running the *CreateDatabase* method**
+2. **Install the SqlClient Data provider on the ATM_DAL Assembly**
+- Open *ATM_DAL* project
+- Right Click on *Dependencies* and select *Manage NuGet packages*
+- Browse *Microsoft.Data.SqlClient* and install.
+
+3. **Create the Database on your system programmatically by running the *CreateDatabase* method**
 - Open *ATM_UI* project
 - Open *program.cs* class
 - Uncomment the *CreateAtmDB.CreateDatabase();*
@@ -61,7 +65,7 @@ CreateAtmDB.CreateDatabase();
 - Save and Run the program
 - Comment out the *CreateAtmDB.CreateDatabase();* after running it successfully.
 
-3. **Connect the newly created Database**
+4. **Connect the newly created Database**
 - Open *ATM_DAL* project
 - Open *Database* folder
 - Open *AtmDbContext.cs*
@@ -75,7 +79,7 @@ public AtmDbContext() : this(@"(paste your newly created database Connection Str
 ```
 - Save
 
-4. **Create the default ATM users data programmatically on your system**
+5. **Create the default ATM users data programmatically on your system**
 - Open the program.cs class 
 - Uncomment the *CreateUsers atmUsers = new CreateUsers(new AtmDbContext());* and *atmUsers.CreateAtmUsers();*
 ```C#
@@ -86,7 +90,7 @@ atmUsers.CreateAtmUsers();
 - Save and Run the program
 - Comment out the *atmUsers.CreateAtmUsers();* ater running it successfully.
 
-5. **Create the Transaction History Table programmatically on your system**
+6. **Create the Transaction History Table programmatically on your system**
 - Open the program.cs class 
 - Uncomment the *CreateTransactionHistory history = new CreateTransactionHistory(new AtmDbContext());* and *history.TransactionHistory();*
 ```C#
@@ -97,16 +101,17 @@ history.TransactionHistory();
 - Save and Run the program
 - Comment out the *CreateTransactionHistory history = new CreateTransactionHistory(new AtmDbContext());* and *history.TransactionHistory();*ater running it successfully.
 
-6. **Run the ATM Application**
+7. **Run the ATM Application**
 - Open the program.cs class
 - Uncomment the *starter.Run();*
 ```C#
 starter.Run();
 ```
 - Save and Run the app
-***
+
+---
 ## Software Development Summary 👓
-***
+
 - Technology: C# and ADO.NET
 - Data Provider: SqlClient
 - SQL Environment: Microsoft SSMS
