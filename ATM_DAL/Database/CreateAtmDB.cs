@@ -8,7 +8,7 @@ namespace ATM_DAL.Database
         public static void CreateDatabase()
         {
 
-            string connectionString = (@"Data Source=LAPTOP-AI62M7MS\SQLEXPRESS; Integrated Security = True; Connect Timeout = 30; Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+            string connectionString = (@"Data Source=(paste your server name here); Integrated Security = True; Connect Timeout = 30; Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
 
             string createDBQuery = $"CREATE DATABASE AtmDatabase";
 
