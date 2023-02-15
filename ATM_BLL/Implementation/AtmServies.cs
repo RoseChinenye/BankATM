@@ -3,7 +3,7 @@ using ATM_DAL.Database;
 using ATM_DAL.Domain;
 using Microsoft.Data.SqlClient;
 using System;
-using static System.TimeZoneInfo;
+
 
 namespace ATM_BLL.Implementation
 {
@@ -34,7 +34,7 @@ namespace ATM_BLL.Implementation
 
             string BalanceQuery = "SELECT Balance FROM ATM_Users WHERE CardNumber = @cardNumber AND PIN = @pin";
 
-            using (SqlCommand command = new SqlCommand(BalanceQuery, sqlConn))
+           using (SqlCommand command = new SqlCommand(BalanceQuery, sqlConn))
             {
                 try
                 {
@@ -58,6 +58,7 @@ namespace ATM_BLL.Implementation
                         updateCommand.ExecuteNonQuery();
                     }
 
+
                     string InsertHistoryQuery = @"INSERT INTO Transaction_History (UserCardNumber, TransactionType, Amount, Date)
                                                    VALUES (@UserCardNumber, @TransactionType, @Amount, @Date)";
 
@@ -71,13 +72,12 @@ namespace ATM_BLL.Implementation
                         historyCommand.ExecuteNonQuery();
                     }
 
+
                     Console.WriteLine($"Deposit Successful! Your new balance is: #{Balance}\n\nPress ENTER to go to Main Menu");
 
                     Console.ReadKey();
                     Console.Clear();
                     AtmMenu.GetMenu();
-                        
-                    
 
                 }
                 catch (Exception e)
@@ -106,68 +106,79 @@ namespace ATM_BLL.Implementation
 
             string BalanceQuery = "SELECT Balance FROM ATM_Users WHERE CardNumber = @cardNumber AND PIN = @pin";
 
-            using (SqlCommand command = new SqlCommand(BalanceQuery, sqlConn))
+
+            using (SqlTransaction sqlTransaction = sqlConn.BeginTransaction())
             {
                 try
                 {
-                    command.Parameters.AddWithValue("@cardNumber", User.CardNumber);
-                    command.Parameters.AddWithValue("@pin", User.Pin);
-
-                    decimal Balance = (decimal)command.ExecuteScalar();
-
-                    if (Balance < WithdrawalAmount)
+                    using (SqlCommand command = new SqlCommand(BalanceQuery, sqlConn, sqlTransaction))
                     {
-                        Console.WriteLine("Insufficient balance. Your current balance is: " + Balance);
-                        Withdraw();
-                    }
-                    else
-                    {
-                        Balance -= WithdrawalAmount;
-
-
-                        string TransactionType = "Withdrawal";
-                        DateTime TransactionTime = DateTime.Now;
-
-                        string updateQuery = "UPDATE ATM_Users SET Balance = @balance WHERE CardNumber = @cardNumber AND Pin = @pin";
-                        using (SqlCommand updateCommand = new SqlCommand(updateQuery, sqlConn))
+                        try
                         {
-                            updateCommand.Parameters.AddWithValue("@balance", Balance);
-                            updateCommand.Parameters.AddWithValue("@cardNumber", User.CardNumber);
-                            updateCommand.Parameters.AddWithValue("@pin", User.Pin);
-                            updateCommand.ExecuteNonQuery();
-                        }
+                            command.Parameters.AddWithValue("@cardNumber", User.CardNumber);
+                            command.Parameters.AddWithValue("@pin", User.Pin);
+
+                            decimal Balance = (decimal)command.ExecuteScalar();
 
 
-                        string InsertHistoryQuery = @"INSERT INTO Transaction_History (UserCardNumber, TransactionType, Amount, Date)
+                            if (Balance < WithdrawalAmount)
+                            {
+                                Console.WriteLine("Insufficient balance. Your current balance is: " + Balance);
+                                Withdraw();
+                            }
+                            else
+                            {
+                                Balance -= WithdrawalAmount;
+
+
+                                string TransactionType = "Withdrawal";
+                                DateTime TransactionTime = DateTime.Now;
+
+                                string updateQuery = "UPDATE ATM_Users SET Balance = @balance WHERE CardNumber = @cardNumber AND Pin = @pin";
+                                using (SqlCommand updateCommand = new SqlCommand(updateQuery, sqlConn, sqlTransaction))
+                                {
+                                    updateCommand.Parameters.AddWithValue("@balance", Balance);
+                                    updateCommand.Parameters.AddWithValue("@cardNumber", User.CardNumber);
+                                    updateCommand.Parameters.AddWithValue("@pin", User.Pin);
+                                    updateCommand.ExecuteNonQuery();
+                                }
+
+
+                                string InsertHistoryQuery = @"INSERT INTO Transaction_History (UserCardNumber, TransactionType, Amount, Date)
                                                    VALUES (@UserCardNumber, @TransactionType, @Amount, @Date)";
 
-                        using (SqlCommand historyCommand = new SqlCommand(InsertHistoryQuery, sqlConn))
-                        {
-                            historyCommand.Parameters.AddWithValue("@UserCardNumber", User.CardNumber);
-                            historyCommand.Parameters.AddWithValue("@TransactionType", TransactionType);
-                            historyCommand.Parameters.AddWithValue("@Amount", WithdrawalAmount);
-                            historyCommand.Parameters.AddWithValue("@Date", TransactionTime);
+                                using (SqlCommand historyCommand = new SqlCommand(InsertHistoryQuery, sqlConn, sqlTransaction))
+                                {
+                                    historyCommand.Parameters.AddWithValue("@UserCardNumber", User.CardNumber);
+                                    historyCommand.Parameters.AddWithValue("@TransactionType", TransactionType);
+                                    historyCommand.Parameters.AddWithValue("@Amount", WithdrawalAmount);
+                                    historyCommand.Parameters.AddWithValue("@Date", TransactionTime);
 
-                            historyCommand.ExecuteNonQuery();
+                                    historyCommand.ExecuteNonQuery();
+                                }
+
+                                Console.WriteLine($"Withdrawal successful. Your new balance is: #{Balance}\n\nPress ENTER to go to Main Menu");
+
+                                Console.ReadKey();
+                                Console.Clear();
+                                AtmMenu.GetMenu();
+
+                            }
+
                         }
-                        
-                        Console.WriteLine($"Withdrawal successful. Your new balance is: #{Balance}\n\nPress ENTER to go to Main Menu");
-
-                        Console.ReadKey();
-                        Console.Clear();
-                        AtmMenu.GetMenu();
-                        
-
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Error: {0}", e);
+                        }
+                        finally
+                        {
+                            sqlConn.Close();
+                        }
                     }
-
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Error: {0}", e);
-                }
-                finally
-                {
-                    sqlConn.Close();
+                    sqlTransaction.Rollback();
                 }
             }
         }
@@ -191,127 +202,138 @@ namespace ATM_BLL.Implementation
 
             SqlConnection sqlConn = _dbContext.OpenConnection();
 
-            using (SqlCommand verifyCommand = new SqlCommand(VerifyRecieverQuery, sqlConn))
+            using (SqlTransaction sqlTransaction = sqlConn.BeginTransaction())
             {
                 try
                 {
-                    verifyCommand.Parameters.AddWithValue("@recieverAccountNo", RecieverAccountNo);
-
-                    int result = (int)verifyCommand.ExecuteScalar();
-
-                    if (result > 0)
+                    using (SqlCommand verifyCommand = new SqlCommand(VerifyRecieverQuery, sqlConn, sqlTransaction))
                     {
-                        isRecieverAccountNoValid = true;
-                    }
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Transfer failed. Incorrect Reciever's Account Number.\nPlease crosscheck the account number and try again!");
-                }
-            }
-
-            if (isRecieverAccountNoValid)
-            {
-
-                Console.WriteLine("Enter amount you want to Transfer: ");
-                string input2 = Console.ReadLine();
-                while (string.IsNullOrEmpty(input2) || input2 == "0" || !decimal.TryParse(input2, out _))
-                {
-                    Console.WriteLine("Invalid input. Please enter a valid amount: ");
-                    input2 = Console.ReadLine();
-                }
-                decimal TransferAmount = Convert.ToDecimal(input2);
-
-
-                string BalanceQuery = "SELECT Balance FROM ATM_Users WHERE CardNumber = @cardNumber AND PIN = @pin";
-
-                using (SqlCommand command = new SqlCommand(BalanceQuery, sqlConn))
-                {
-                    try
-                    {
-                        command.Parameters.AddWithValue("@cardNumber", User.CardNumber);
-                        command.Parameters.AddWithValue("@pin", User.Pin);
-
-                        decimal Balance = (decimal)command.ExecuteScalar();
-
-                        if (Balance < TransferAmount)
+                        try
                         {
-                            Console.WriteLine("You can't continue this tansaction because of Insufficient balance. Your current balance is: " + Balance);
-                            Transfer();
-                        }
-                        else
-                        {
-                            Balance -= TransferAmount;
+                            verifyCommand.Parameters.AddWithValue("@recieverAccountNo", RecieverAccountNo);
 
-                            string TransactionType = "Transfer";
-                            DateTime TransactionTime = DateTime.Now;
+                            int result = (int)verifyCommand.ExecuteScalar();
 
-                            string SenderQuery = "UPDATE ATM_Users SET Balance = @balance WHERE CardNumber = @cardNumber AND PIN = @pin";
-                            using (SqlCommand updateCommand = new SqlCommand(SenderQuery, sqlConn))
+                            if (result > 0)
                             {
-                                updateCommand.Parameters.AddWithValue("@balance", Balance);
-                                updateCommand.Parameters.AddWithValue("@cardNumber", User.CardNumber);
-                                updateCommand.Parameters.AddWithValue("@pin", User.Pin);
-                                updateCommand.ExecuteNonQuery();
+                                isRecieverAccountNoValid = true;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Transfer failed. Incorrect Reciever's Account Number.\nPlease crosscheck the account number and try again!");
+                        }
+                    }
+
+                    if (isRecieverAccountNoValid)
+                    {
+
+                        Console.WriteLine("Enter amount you want to Transfer: ");
+                        string input2 = Console.ReadLine();
+                        while (string.IsNullOrEmpty(input2) || input2 == "0" || !decimal.TryParse(input2, out _))
+                        {
+                            Console.WriteLine("Invalid input. Please enter a valid amount: ");
+                            input2 = Console.ReadLine();
+                        }
+                        decimal TransferAmount = Convert.ToDecimal(input2);
 
 
-                                string RecieverQuery = "SELECT Balance FROM ATM_Users WHERE AccountNo = @recieverAccountNo";
-                                using (SqlCommand RecieverCommand = new SqlCommand(RecieverQuery, sqlConn))
+                        string BalanceQuery = "SELECT Balance FROM ATM_Users WHERE CardNumber = @cardNumber AND PIN = @pin";
+
+                        using (SqlCommand command = new SqlCommand(BalanceQuery, sqlConn, sqlTransaction))
+                        {
+                            try
+                            {
+                                command.Parameters.AddWithValue("@cardNumber", User.CardNumber);
+                                command.Parameters.AddWithValue("@pin", User.Pin);
+
+                                decimal Balance = (decimal)command.ExecuteScalar();
+
+                                if (Balance < TransferAmount)
                                 {
-                                    RecieverCommand.Parameters.AddWithValue("@recieverAccountNo", RecieverAccountNo);
-                                    decimal recieverBalance = (decimal)RecieverCommand.ExecuteScalar();
-                                    recieverBalance += TransferAmount;
+                                    Console.WriteLine("You can't continue this tansaction because of Insufficient balance. Your current balance is: " + Balance);
+                                    Transfer();
+                                }
+                                else
+                                {
+                                    Balance -= TransferAmount;
 
-                                    string recieverUpdateQuery = "UPDATE ATM_Users SET Balance = @recieverBalance WHERE AccountNo = @recieverAccountNo";
-                                    using (SqlCommand recieverUpdateCommand = new SqlCommand(recieverUpdateQuery, sqlConn))
+                                    string TransactionType = "Transfer";
+                                    DateTime TransactionTime = DateTime.Now;
+
+                                    string SenderQuery = "UPDATE ATM_Users SET Balance = @balance WHERE CardNumber = @cardNumber AND PIN = @pin";
+                                    using (SqlCommand updateCommand = new SqlCommand(SenderQuery, sqlConn, sqlTransaction))
                                     {
-                                        recieverUpdateCommand.Parameters.AddWithValue("@recieverBalance", recieverBalance);
-                                        recieverUpdateCommand.Parameters.AddWithValue("@recieverAccountNo", RecieverAccountNo);
+                                        updateCommand.Parameters.AddWithValue("@balance", Balance);
+                                        updateCommand.Parameters.AddWithValue("@cardNumber", User.CardNumber);
+                                        updateCommand.Parameters.AddWithValue("@pin", User.Pin);
+                                        updateCommand.ExecuteNonQuery();
 
-                                        recieverUpdateCommand.ExecuteNonQuery();
-                                    }
 
-                                    string InsertHistoryQuery = @"INSERT INTO Transaction_History (UserCardNumber, TransactionType, Amount, Date)
+                                        string RecieverQuery = "SELECT Balance FROM ATM_Users WHERE AccountNo = @recieverAccountNo";
+                                        using (SqlCommand RecieverCommand = new SqlCommand(RecieverQuery, sqlConn, sqlTransaction))
+                                        {
+                                            RecieverCommand.Parameters.AddWithValue("@recieverAccountNo", RecieverAccountNo);
+                                            decimal recieverBalance = (decimal)RecieverCommand.ExecuteScalar();
+                                            recieverBalance += TransferAmount;
+
+                                            string recieverUpdateQuery = "UPDATE ATM_Users SET Balance = @recieverBalance WHERE AccountNo = @recieverAccountNo";
+                                            using (SqlCommand recieverUpdateCommand = new SqlCommand(recieverUpdateQuery, sqlConn, sqlTransaction))
+                                            {
+                                                recieverUpdateCommand.Parameters.AddWithValue("@recieverBalance", recieverBalance);
+                                                recieverUpdateCommand.Parameters.AddWithValue("@recieverAccountNo", RecieverAccountNo);
+
+                                                recieverUpdateCommand.ExecuteNonQuery();
+                                            }
+
+                                            string InsertHistoryQuery = @"INSERT INTO Transaction_History (UserCardNumber, TransactionType, Amount, Date)
                                                    VALUES (@UserCardNumber, @TransactionType, @Amount, @Date)";
 
-                                    using (SqlCommand historyCommand = new SqlCommand(InsertHistoryQuery, sqlConn))
-                                    {
-                                        historyCommand.Parameters.AddWithValue("@UserCardNumber", User.CardNumber);
-                                        historyCommand.Parameters.AddWithValue("@TransactionType", TransactionType);
-                                        historyCommand.Parameters.AddWithValue("@Amount", TransferAmount);
-                                        historyCommand.Parameters.AddWithValue("@Date", TransactionTime);
+                                            using (SqlCommand historyCommand = new SqlCommand(InsertHistoryQuery, sqlConn, sqlTransaction))
+                                            {
+                                                historyCommand.Parameters.AddWithValue("@UserCardNumber", User.CardNumber);
+                                                historyCommand.Parameters.AddWithValue("@TransactionType", TransactionType);
+                                                historyCommand.Parameters.AddWithValue("@Amount", TransferAmount);
+                                                historyCommand.Parameters.AddWithValue("@Date", TransactionTime);
 
-                                        historyCommand.ExecuteNonQuery();
+                                                historyCommand.ExecuteNonQuery();
+                                            }
+
+                                            Console.WriteLine($"Transfer successful. Your new balance is: #{Balance}\n\nPress Enter to go to the Main Menu");
+
+                                            Console.ReadKey();
+                                            Console.Clear();
+                                            AtmMenu.GetMenu();
+
+                                        }
+
                                     }
 
-                                    Console.WriteLine($"Transfer successful. Your new balance is: #{Balance}\n\nPress Enter to go to the Main Menu");
-
-                                    Console.ReadKey();
-                                    Console.Clear();
-                                    AtmMenu.GetMenu();
-                                    
                                 }
 
                             }
-
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Error: {0}", e);
+                            }
+                            finally
+                            {
+                                sqlConn.Close();
+                            }
                         }
-
                     }
-                    catch (Exception e)
+                    else
                     {
-                        Console.WriteLine("Error: {0}", e);
-                    }
-                    finally
-                    {
-                        sqlConn.Close();
+                        Console.WriteLine();
+                        Transfer();
                     }
                 }
+                catch(Exception e) 
+                {
+                    sqlTransaction.Rollback();
+                }
             }
-            else
-            {
-                Console.WriteLine();
-                Transfer();
-            }
+            
 
         }
 
