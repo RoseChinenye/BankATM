@@ -65,9 +65,9 @@ CreateAtmDB.CreateDatabase();
 - Open *ATM_DAL* project
 - Open *Database* folder
 - Open *AtmDbContext.cs*
-- Edit the connection string and paste your newly created Database connection string on the *Data Source* value of the *AtmDbContext* Constructor.
+- Edit the connection string and pass your newly created Database connection string to the *AtmDbContext* Constructor.
 ```C#
-public AtmDbContext() : this(@"Data            Source=LAPTOP-AI62M7MS\SQLEXPRESS;Initial Catalog=AtmDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
+public AtmDbContext() : this(@"(paste your newly created database Connection String here)")
 {
 
 }
