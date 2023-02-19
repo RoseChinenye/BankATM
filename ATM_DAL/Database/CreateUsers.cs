@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using ATM_DAL.Database;
 using System;
+using System.Threading.Tasks;
 
 namespace ATM_BLL.Implementation
 {
@@ -18,10 +19,10 @@ namespace ATM_BLL.Implementation
         {
         }
 
-        public void CreateAtmUsers()
+        public async Task CreateAtmUsers()
         {
 
-            SqlConnection sqlConn = _dbContext.OpenConnection();
+            SqlConnection sqlConn = await _dbContext.OpenConnection();
 
             string CreateUsers = @"CREATE TABLE ATM_Users (
                                     UserID INT PRIMARY KEY IDENTITY (1,1),
@@ -47,23 +48,16 @@ namespace ATM_BLL.Implementation
                                         'okekechinenye@gmail.com', '09071686750', '1222324052', '1935', '250000.00');";
 
 
-            using (SqlCommand command = new SqlCommand(CreateUsers, sqlConn))
+            using SqlCommand command = new SqlCommand(CreateUsers, sqlConn);
+            try
             {
-                try
-                {
-                    command.ExecuteNonQuery();
-                    Console.WriteLine("Atm Users table created and populated successfully.");
+                await command.ExecuteNonQueryAsync();
+                
 
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error: {0}", ex.Message);
-                }
-                finally
-                {
-
-                    _dbContext.CloseConnection();
-                }
+            }
+            catch (Exception)
+            {
+                Console.Clear();
             }
         }
 

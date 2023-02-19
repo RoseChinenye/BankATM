@@ -1,25 +1,16 @@
 ﻿using ATM_BLL.Implementation;
 using ATM_DAL.Database;
+using ATM_DAL.Domain;
 
 namespace ATM_UI
 {
     public class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            //Creating Database
-            //CreateAtmDB.CreateDatabase();
 
+            await starter.Run();
 
-            //Creating Default Atm users
-            //CreateUsers atmUsers = new CreateUsers(new AtmDbContext());
-            //atmUsers.CreateAtmUsers();
-
-            //Creating Transaction History Table
-            //CreateTransactionHistory history = new CreateTransactionHistory(new AtmDbContext());
-            //history.TransactionHistory();
-
-            starter.Run();
         }
     }
 }

@@ -22,22 +22,22 @@ namespace ATM_DAL.Database
         }
 
 
-        public SqlConnection OpenConnection()
+        public async Task <SqlConnection> OpenConnection()
         {
             _dbConnection = new SqlConnection(_connString);
-            _dbConnection.Open();
+            await _dbConnection.OpenAsync();
             return _dbConnection;
         }
 
-        public void CloseConnection()
+        public async Task CloseConnection()
         {
             if (_dbConnection?.State != System.Data.ConnectionState.Closed)
             {
-                _dbConnection?.Close();
+               await _dbConnection?.CloseAsync();
             }
         }
 
-        bool _disposed = false;
+        private bool _disposed = false;
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)

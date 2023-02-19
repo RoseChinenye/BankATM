@@ -2,10 +2,11 @@
 using Microsoft.Data.SqlClient;
 using System;
 using System.Transactions;
+using System.Threading.Tasks;
 
 namespace ATM_DAL.Database
 {
-    public class CreateTransactionHistory 
+    public class CreateTransactionHistory : IDisposable
     {
         private readonly AtmDbContext _dbContext;
         private bool _disposed;
@@ -19,9 +20,9 @@ namespace ATM_DAL.Database
         {
         }
 
-        public void TransactionHistory()
+        public async Task TransactionHistory()
         {
-            SqlConnection sqlConn = _dbContext.OpenConnection();
+            SqlConnection sqlConn = await _dbContext.OpenConnection();
 
             string CreateTransactionTable = @"CREATE TABLE Transaction_History(
                                     TransactionID INT PRIMARY KEY IDENTITY(1, 1),
@@ -31,23 +32,16 @@ namespace ATM_DAL.Database
                                     Date datetime default CURRENT_TIMESTAMP,
                                     FOREIGN KEY(UserCardNumber) REFERENCES ATM_Users(CardNumber)
                                     )";
-            
-            using (SqlCommand command = new SqlCommand(CreateTransactionTable, sqlConn))
-            {
-                try
-                {
-                    command.ExecuteNonQuery();
-                    Console.WriteLine("Transaction History table created successfully.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error: " + ex.Message);
-                }
-                finally
-                {
 
-                    _dbContext.CloseConnection();
-                }
+            using SqlCommand command = new SqlCommand(CreateTransactionTable, sqlConn);
+            try
+            {
+                await command.ExecuteNonQueryAsync();
+                
+            }
+            catch (Exception)
+            {
+                Console.Clear();
             }
         }
 

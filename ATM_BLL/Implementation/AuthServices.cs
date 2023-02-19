@@ -3,6 +3,7 @@ using ATM_DAL.Database;
 using ATM_DAL.Domain;
 using Microsoft.Data.SqlClient;
 using System;
+using System.Threading.Tasks;
 
 
 namespace ATM_BLL.Implementation
@@ -18,7 +19,7 @@ namespace ATM_BLL.Implementation
         {
             _dbContext = dbContext;
         }
-        public void UserLogin()
+        public async Task UserLogin()
         {
 
             Console.WriteLine("Enter CardNumber: ");
@@ -26,77 +27,61 @@ namespace ATM_BLL.Implementation
 
             Console.WriteLine("Enter Pin: ");
             User.Pin = Console.ReadLine();
-
+            
             bool IsValid = false;
-
+            
             string VerifyUser = "SELECT * FROM ATM_Users WHERE CardNumber = @CardNumber AND Pin = @Pin ";
+            
+            SqlConnection sqlConn = await _dbContext.OpenConnection();
+            
 
-            SqlConnection sqlConn = _dbContext.OpenConnection();
-
-            using (SqlCommand command = new SqlCommand(VerifyUser, sqlConn))
+            await using SqlCommand command = new SqlCommand(VerifyUser, sqlConn);
+            try
             {
-                try
+                command.Parameters.AddWithValue("@CardNumber", User.CardNumber);
+                command.Parameters.AddWithValue("@Pin", User.Pin);
+
+
+                int result = (int)await command.ExecuteScalarAsync();
+
+
+                if (result > 0)
                 {
-                    command.Parameters.AddWithValue("@CardNumber", User.CardNumber);
-                    command.Parameters.AddWithValue("@Pin", User.Pin);
-
-
-                    int result = (int)command.ExecuteScalar();
-
-
-                    if (result > 0)
-                    {
-                        IsValid = true;
-                    }
-
-
-                }
-                catch (Exception)
-                {
-                    Console.WriteLine("Login failed. Incorrect Card Number or Pin.\nPlease Enter Correct Card Number and Pin. ");
-                }
-                finally
-                {
-
-                    _dbContext.CloseConnection();
+                    IsValid = true;
                 }
 
-                if (IsValid)
-                {
-
-                    Console.WriteLine("Login successful!\n\nPress ENTER to continue!");
-                    Console.ReadKey();
-                    Console.Clear();
-                    AtmMenu.GetMenu();
-                }
-                else
-                {
-                    Console.WriteLine();
-                    UserLogin();
-                }
 
             }
+            catch (Exception)
+            {
+                Console.WriteLine("Login failed. Incorrect Card Number or Pin.\nPlease Enter Correct Card Number and Pin. ");
+            }
+            
 
+            if (IsValid)
+            {
+
+                Console.WriteLine("Login successful!\n\nPress ENTER to continue!");
+                Console.ReadKey();
+                Console.Clear();
+                await AtmMenu.GetMenu();
+            }
+            else
+            {
+                Console.WriteLine();
+                await UserLogin();
+            }
         }
 
 
-        public static void UserLogout()
+        public static async Task UserLogout()
         {
             Console.WriteLine("You have Successfully logged out!\nPress ENTER to Start again");
             Console.ReadKey();
             Console.Clear();
-            starter.Run();
+            await starter.Run();
         }
 
-        public void AdminLogin()
-        {
-
-        }
-
-        public void AdminLogout()
-        {
-
-        }
 
         protected virtual void Dispose(bool disposing)
         {

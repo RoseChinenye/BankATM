@@ -1,13 +1,15 @@
 ﻿using ATM_BLL.Interface;
 using ATM_DAL.Database;
 using System;
+using System.Threading.Tasks;
 
 namespace ATM_BLL.Implementation
 {
     public class AtmMenu
     {
-        public static void GetMenu()
+        public static async Task GetMenu()
         {
+
             Console.WriteLine("Select any of the options");
             Console.WriteLine("Enter 1 to Deposit\nEnter 2 to Check balance\nEnter 3 to Withdraw\nEnter 4 to Transfer\nEnter 5 to Log Out");
 
@@ -20,23 +22,23 @@ namespace ATM_BLL.Implementation
                 switch (userInput)
                 {
                     case 1:
-                        services.Deposit();
+                        await services.Deposit();
                         break;
 
                     case 2:
-                        services.CheckBalance();
+                        await services.CheckBalance();
                         break;
 
                     case 3:
-                        services.Withdraw();
+                        await services.Withdraw();
                         break;
 
                     case 4:
-                        services.Transfer();
+                        await services.Transfer();
                         break;
 
                     case 5:
-                        AuthServices.UserLogout();
+                        await AuthServices.UserLogout();
                         break;
 
                     default:
@@ -46,7 +48,7 @@ namespace ATM_BLL.Implementation
             else
             {
                 Console.WriteLine("Your input appears to be invalid, please try a numeric value");
-                GetMenu();
+                await GetMenu();
             }
         }
     }

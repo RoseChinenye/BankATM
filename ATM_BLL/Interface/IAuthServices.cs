@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace ATM_BLL.Interface
 {
     public interface IAuthServices : IDisposable
     {
-        void UserLogin();
+        Task UserLogin();
 
     }
 }
