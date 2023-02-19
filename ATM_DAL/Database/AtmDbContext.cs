@@ -10,7 +10,7 @@ namespace ATM_DAL.Database
 
         private SqlConnection _dbConnection = null;
 
-        public AtmDbContext() : this(@"Data Source=LAPTOP-AI62M7MS\SQLEXPRESS;Initial Catalog=AtmDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
+        public AtmDbContext() : this(@"(paste your newly created database Connection String here)")
         {
 
         }
