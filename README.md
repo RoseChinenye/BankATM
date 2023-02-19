@@ -55,17 +55,7 @@ string connectionString = (@"Data Source = (Your Server Name); Integrated Securi
 - Right Click on *Dependencies* and select *Manage NuGet packages*
 - Browse *Microsoft.Data.SqlClient* and install.
 
-3. **Create the Database on your system programmatically by running the *CreateDatabase* method**
-- Open *ATM_UI* project
-- Open *program.cs* class
-- Uncomment the *CreateAtmDB.CreateDatabase();*
-```C#
-CreateAtmDB.CreateDatabase();
-```
-- Save and Run the program
-- Comment out the *CreateAtmDB.CreateDatabase();* after running it successfully.
-
-4. **Connect the newly created Database**
+3. **Connect the newly created Database**
 - Open *ATM_DAL* project
 - Open *Database* folder
 - Open *AtmDbContext.cs*
@@ -78,36 +68,6 @@ public AtmDbContext() : this(@"(paste your newly created database Connection Str
         
 ```
 - Save
-
-5. **Create the default ATM users data programmatically on your system**
-- Open the program.cs class 
-- Uncomment the *CreateUsers atmUsers = new CreateUsers(new AtmDbContext());* and *atmUsers.CreateAtmUsers();*
-```C#
-CreateUsers atmUsers = new CreateUsers(new AtmDbContext());
-
-atmUsers.CreateAtmUsers();
-```
-- Save and Run the program
-- Comment out the *atmUsers.CreateAtmUsers();* ater running it successfully.
-
-6. **Create the Transaction History Table programmatically on your system**
-- Open the program.cs class 
-- Uncomment the *CreateTransactionHistory history = new CreateTransactionHistory(new AtmDbContext());* and *history.TransactionHistory();*
-```C#
-CreateTransactionHistory history = new CreateTransactionHistory(new AtmDbContext());
-
-history.TransactionHistory();
-```
-- Save and Run the program
-- Comment out the *CreateTransactionHistory history = new CreateTransactionHistory(new AtmDbContext());* and *history.TransactionHistory();*ater running it successfully.
-
-7. **Run the ATM Application**
-- Open the program.cs class
-- Uncomment the *starter.Run();*
-```C#
-starter.Run();
-```
-- Save and Run the app
 
 ---
 ## Software Development Summary 👓
