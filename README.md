@@ -68,6 +68,8 @@ public AtmDbContext() : this(@"(paste your newly created database Connection Str
         
 ```
 - Save
+- 
+4. **Run the program**
 
 ---
 ## Software Development Summary 👓
